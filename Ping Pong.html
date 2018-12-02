@@ -1,0 +1,358 @@
+<!-- @author: murad_alm. -->
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Ping Pong</title>
+			<style type="text/css">
+			.buttonsPanel {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+			}
+			.button {
+			  	display: block;
+			  	border-radius: 10px;
+			  	background-color: #c4001d;
+			  	transition-duration: 0.4s;
+			  	border: none;
+			  	color: white;
+			  	text-align: center;
+			  	font-size: 28px;
+			  	padding: 20px;
+			  	width: 200px;
+			  	transition: all 0.4s;
+			  	cursor: pointer;
+			  	margin: 10px;			  
+			}
+
+			.button span {
+			  	cursor: pointer;
+			  	display: inline-block;
+			  	position: relative;
+			  	transition: 0.4s;
+			}
+			.button span:after {
+			  	content: '\00bb';
+			  	position: absolute;
+			  	opacity: 0;
+			  	top: 0;
+			  	right: -20px;
+			  	transition: 0.4s;
+			}
+
+			.button:hover span {
+			  	padding-right: 25px;
+			}
+
+			.button:hover span:after {
+			  	opacity: 1;
+			  	right: 0;
+			}
+			.button:hover {
+			    background-color: #ff616f;
+			    color: white;
+			}
+			.button:active {
+			  	background-color: #ff1744;
+			  	box-shadow: 0 5px #666;
+			  	transform: translateY(4px);
+			}
+
+
+			.dropbtn {
+				position: absolute;
+				display: block;
+			    background-color: #c4001d;
+			    transition-duration: 0.4s;
+			    border: none;
+			    color: white;
+			    text-align: center;
+			    font-size: 28px;
+			    padding: 20px;
+			    width: 200px;
+			    transition: all 0.4s;
+			    cursor: pointer;
+			    margin: 10px;
+			    border-radius: 10px;
+			    cursor: pointer;
+			    top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+			}
+
+			.dropdown {
+			    display: block;
+			    top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+			    display: inline-block;
+			}
+
+			.dropdown-content {
+			    display: none;
+			    position: absolute;
+			    background-color: #f9f9f9;
+			    min-width: 160px;
+			    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+			    z-index: 1;
+			    position: absolute;
+			    top: 70%;
+				left: 50%;
+				transform: translate(-50%, 10%);
+			}
+
+			.dropdown-content a {
+			    color: black;
+			    padding: 12px 16px;
+			    text-decoration: none;
+			    display: block;
+			}
+
+			.dropdown-content a:hover {
+				background-color: #ff1744
+			}
+
+			.dropdown:hover .dropdown-content {
+			    display: block;
+			}
+
+			.dropdown:hover .dropbtn {
+			    background-color: #ff616f;
+			}
+
+			.optionMenu{
+				display: none;
+				margin: 10px;
+				padding: 20px;
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+			}
+		</style>
+	</head>
+	<audio id= "backgroundMusic" src= "backgroundMusic.mp3"></audio>
+ 	<audio id= "hit" src= "hit2.mp3"></audio>
+ 	<audio id= "fail" src= "fail.wav"></audio>
+ 	<audio id= "win" src= "win.mp3"></audio>
+	<canvas id= "gameCanvas" width= "1080" height= "620"></canvas>
+	
+
+	<script>
+			var canvas = document.getElementById ('gameCanvas');;
+			var canvasContext = canvas.getContext ('2d');
+			
+			const FAIL_SOUND = document.getElementById('fail');
+			const HIT_SOUND = document.getElementById('hit');
+			const WIN_SOUND = document.getElementById('win');
+			const BACKGROUND_MUSIC = document.getElementById('backgroundMusic');
+			BACKGROUND_MUSIC.volume = 0.5;
+			
+			var ballX;
+			var ballY;
+			var ballSpeedY;
+			var ballSpeedX;
+			var deltaY;
+			var leftPlayerScore;
+			var rightPlayerScore;
+			var leftPaddleY = 220;
+			var rightPaddleY = 220;
+			var roundEnded = false;
+			const FPS = 60;
+			const PADDLE_HEIGHT = 150;		
+			const BALL_RADIUS = 20;
+			const PADDLE_THICKNESS = 10;
+			const WINNING_SCORE = 5;
+			const BACKGROUND_COLOR = 'black';
+			var userBallSpeedY = 5;
+
+			function showOptionsMenu(){
+				hideMainMenu();
+				var optionMenu = document.getElementById('optionMenu');
+				optionMenu.style.display = "block";
+			}
+
+			function hideOptionsMenu(){
+				var optionsMenu = document.getElementById('optionMenu');
+				optionsMenu.style.display = "none";
+				showMainMenu();
+			}
+
+			function showMainMenu(){
+				var buttons = document.getElementById('buttonsPanel');
+				buttons.style.display = "block";
+			}
+			function hideMainMenu(){
+				var buttonsPanel = document.getElementById('buttonsPanel');
+				buttonsPanel.style.display= "none";
+			}
+
+			function calculateMousePos(evt){
+				var rect = canvas.getBoundingClientRect();
+				var root = document.documentElement;
+				var mouseX = evt.clientX - rect.left - root.scrollLeft;
+				var mouseY = evt.clientY - rect.top - root.scrollTop;
+				return{
+						x: mouseX,
+						y: mouseY
+				};
+			}
+
+			function setBallSpeed(userSpeed){
+				userBallSpeedY = userSpeed;
+			}
+
+			function resetScores(){
+				ballX = 0;
+				ballY = 0;
+				ballSpeedY = userBallSpeedY;
+				ballSpeedX =15;
+				deltaY = 0;
+				leftPlayerScore = 0;
+				rightPlayerScore = 0;
+				roundEnded = false;
+			}
+
+			function startGame(){
+				hideMainMenu();
+				resetScores();
+				setInterval (function(){
+								backgroundMusic.play();
+								move();
+								draw();
+								}, 1000/FPS);			
+				//paddle movement according to the mouse position
+				canvas.addEventListener('mousemove', function(evt){
+											var mousePos = calculateMousePos(evt);
+											rightPaddleY = mousePos.y - (PADDLE_HEIGHT /2);
+				})
+			}
+
+			function stopGame() {
+				backgroundMusic.pause();
+				roundEnded = true;
+				rect(0, 0, canvas.width, canvas.height, BACKGROUND_COLOR);
+				showMainMenu();
+			}
+			
+
+			function resetBallPos(){
+				if(leftPlayerScore == WINNING_SCORE || rightPlayerScore == WINNING_SCORE){
+						stopGame();
+				}
+				else{
+						ballSpeedY = userBallSpeedY;
+						ballX = canvas.width / 2;
+						ballY = canvas.height / 2;
+			}
+			}
+
+			function AI(){
+				if (!roundEnded) {
+					var leftPaddleYCanter = leftPaddleY + (PADDLE_HEIGHT / 2); 
+					if(leftPaddleYCanter < ballY + 25){
+							leftPaddleY += 10;
+					}
+					else if(leftPaddleYCanter > ballY - 25){
+							leftPaddleY -= 10;
+					}
+				}
+			}
+
+			function move(){
+				if (!roundEnded) {
+					AI();
+					ballX += ballSpeedX;
+					ballY += ballSpeedY;
+
+					//ball's behavior on the left side
+					if(ballX < 0){
+							if(ballY > leftPaddleY && ballY < leftPaddleY + PADDLE_HEIGHT){ 
+									ballSpeedX = -ballSpeedX;
+									deltaY = ballY - (leftPaddleY + PADDLE_HEIGHT / 2);
+									ballSpeedY = deltaY * 0.35;
+									HIT_SOUND.play();
+							}else{
+								rightPlayerScore++;
+								resetBallPos();
+								WIN_SOUND.play();							}
+					}
+					//ball's behavior on the right side
+					if (ballX > canvas.width){
+							if(ballY > rightPaddleY && ballY < rightPaddleY + PADDLE_HEIGHT){
+									ballSpeedX = -ballSpeedX;
+									deltaY = ballY - (rightPaddleY + PADDLE_HEIGHT / 2);
+									ballSpeedY = deltaY * 0.35;
+									HIT_SOUND.play();
+							}else{
+								leftPlayerScore++;
+								resetBallPos();
+								FAIL_SOUND.play();
+							}
+					}
+
+					if(ballY < 0 || ballY > canvas.height) {
+						ballSpeedY = -ballSpeedY;
+					}
+				}
+			}
+
+			function draw(){
+				if(!roundEnded){
+					//backgroundCanvas
+					rect(0, 0, canvas.width, canvas.height, BACKGROUND_COLOR); 
+					//ball
+					circle(ballX, ballY, BALL_RADIUS, 0, Math.PI * 2, true, 'white');
+					//left paddle
+					rect(0, leftPaddleY, PADDLE_THICKNESS, PADDLE_HEIGHT, 'white');
+					//right paddle
+					rect(canvas.width - PADDLE_THICKNESS, rightPaddleY, PADDLE_THICKNESS, PADDLE_HEIGHT, 'white');
+					//border in the center
+					for(var i = 0; i < canvas.height; i += 30){
+						rect(canvas.width / 2, i, 2, 25, 'white');
+					}
+					//Score
+					canvasContext.font = 'italic 40pt Calibri';
+					canvasContext.fillText(leftPlayerScore, (canvas.width/2) / 2, 100);
+					canvasContext.fillText(rightPlayerScore, (canvas.width/2) + (canvas.width/4), 100);
+				}
+				else if(roundEnded){
+					stopGame();
+				}
+			}
+
+			function rect (xPos, yPos, width, height, color){ 
+					canvasContext.fillStyle = color;
+					canvasContext.fillRect (xPos, yPos, width, height);
+			}
+
+			function circle(centerX, centerY, radius, startAngle, endAngle, anticlockwise, color){
+					canvasContext.fillStyle = color;
+					canvasContext.beginPath();
+					canvasContext.arc(centerX, centerY, radius, startAngle, endAngle, anticlockwise, color);
+					canvasContext.fill();
+			}
+	</script>
+	
+
+	<body bgcolor="#000000">
+		<div class="buttonsPanel" id="buttonsPanel">
+			<button class="button" onclick="startGame()"><span>New Game</span></button>
+			<button class="button" onclick="showOptionsMenu()"><span>Options</span></button>
+		</div>
+
+		<div class="optionMenu" id="optionMenu">
+			<div class="dropdown">
+			  <button class="dropbtn">Dropdown</button>
+			  <div class="dropdown-content">
+			    <a href="#" onclick="setBallSpeed(60)">60</a>
+			    <a href="#">Link 2</a>
+			    <a href="#">Link 3</a>
+			 </div>
+			</div>
+			<button class="button" id="closeOptions" onclick="hideOptionsMenu()"><span>Close</span></button>
+		</div>
+</body>
+</html>

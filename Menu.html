@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<style type="text/css">
+		.buttonsPanel {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+		}
+		.button {
+		  display: block;
+		  border-radius: 10px;
+		  background-color: #c4001d;
+		  transition-duration: 0.4s;
+		  border: none;
+		  color: white;
+		  text-align: center;
+		  font-size: 28px;
+		  padding: 20px;
+		  width: 200px;
+		  transition: all 0.4s;
+		  cursor: pointer;
+		  margin: 10px;
+		  
+		}
+
+		.button span {
+		  cursor: pointer;
+		  display: inline-block;
+		  position: relative;
+		  transition: 0.4s;
+		}
+		.button span:after {
+		  content: '\00bb';
+		  position: absolute;
+		  opacity: 0;
+		  top: 0;
+		  right: -20px;
+		  transition: 0.4s;
+		}
+
+		.button:hover span {
+		  padding-right: 25px;
+		}
+
+		.button:hover span:after {
+		  opacity: 1;
+		  right: 0;
+		}
+		.button:hover {
+		    background-color: #ff616f;
+		    color: white;
+		}
+		.button:active {
+		  background-color: #ff1744;
+		  box-shadow: 0 5px #666;
+		  transform: translateY(4px);
+		}
+
+
+		.dropbtn {
+		    background-color: #4CAF50;
+		    color: white;
+		    padding: 16px;
+		    font-size: 16px;
+		    border: none;
+		    cursor: pointer;
+		}
+
+		.dropdown {
+		    position: absolute;
+		    top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+		    display: inline-block;
+		}
+
+		.dropdown-content {
+		    display: none;
+		    position: absolute;
+		    background-color: #f9f9f9;
+		    min-width: 160px;
+		    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+		    z-index: 1;
+		}
+
+		.dropdown-content a {
+		    color: black;
+		    padding: 12px 16px;
+		    text-decoration: none;
+		    display: block;
+		}
+
+		.dropdown-content a:hover {
+			background-color: #f1f1f1
+		}
+
+		.dropdown:hover .dropdown-content {
+		    display: block;
+		}
+
+		.dropdown:hover .dropbtn {
+		    background-color: #3e8e41;
+		}
+	</style>
+	<script type="text/javascript">
+		function test() {
+			var button = document.getElementById('buttonsPanel');
+			button.style.display= "none";
+			//canvasContext.fillStyle = 'red';
+			//canvasContext.fillRect (0, 0, canvas.width, canvas.height);
+		}
+	</script>
+</head>
+<body bgcolor="#000000">
+	<div class="buttonsPanel" id="buttonsPanel">
+	<button class="button"><span>New Game</span></button>
+	<button class="button" onclick="test()"><span>hide</span></button>
+	</div>
+
+<!--div class="dropdown">
+  <button class="dropbtn">Dropdown</button>
+  <div class="dropdown-content">
+    <a href="#">Link 1</a>
+    <a href="#">Link 2</a>
+    <a href="#">Link 3</a>
+ </div>
+</div-->
+</body>
+</html>
